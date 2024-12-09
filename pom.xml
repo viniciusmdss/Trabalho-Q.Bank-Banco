@@ -1,40 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.seubanco</groupId>
   <artifactId>banco</artifactId>
   <version>0.1</version>
-  <packaging>jar</packaging>
+  <packaging>${packaging}</packaging>
 
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>4.7.0</version>
+    <version>4.7.1</version>
   </parent>
-
   <properties>
-    <jdk.version>17</jdk.version> <!-- Alterado para 17 -->
-    <release.version>17</release.version> <!-- Alterado para 17 -->
-    <micronaut.version>4.7.0</micronaut.version>
-    <micronaut.aot.enabled>false</micronaut.aot.enabled>
+    <packaging>jar</packaging>
+    <jdk.version>17</jdk.version>
+    <release.version>17</release.version>
+    <micronaut.version>4.7.1</micronaut.version>
     <micronaut.runtime>netty</micronaut.runtime>
+    <micronaut.aot.enabled>false</micronaut.aot.enabled>
+    <micronaut.aot.packageName>br.com.seubanco.aot.generated</micronaut.aot.packageName>
     <exec.mainClass>br.com.seubanco.Application</exec.mainClass>
   </properties>
 
   <repositories>
     <repository>
-      <id>maven-central</id>
+      <id>central</id>
       <url>https://repo.maven.apache.org/maven2</url>
-    </repository>
-    <repository>
-      <id>micronaut-releases</id>
-      <url>https://repo.micronaut.io/releases</url>
-    </repository>
-    <repository>
-      <id>micronaut-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/io/micronaut/</url>
     </repository>
   </repositories>
 
@@ -74,58 +66,43 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>io.micronaut.serde</groupId>
-      <artifactId>micronaut-serde-processor</artifactId>
-      <version>1.5.0</version>
-    </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
         <groupId>io.micronaut.maven</groupId>
         <artifactId>micronaut-maven-plugin</artifactId>
-        <version>${micronaut.version}</version>
+        <configuration>
+          <configFile>aot-${packaging}.properties</configFile>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <id>enforce-java</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireJavaVersion>
-                  <version>17</version> <!-- Alterado para 17 -->
-                  <message>O projeto requer JDK 17.</message>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
         <configuration>
-          <source>17</source> <!-- Alterado para 17 -->
-          <target>17</target> <!-- Alterado para 17 -->
-          <annotationProcessorPaths>
+          <!-- Uncomment to enable incremental compilation -->
+          <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
+
+          <annotationProcessorPaths combine.children="append">
             <path>
               <groupId>io.micronaut</groupId>
               <artifactId>micronaut-http-validation</artifactId>
-              <version>${micronaut.version}</version>
+              <version>${micronaut.core.version}</version>
             </path>
             <path>
               <groupId>io.micronaut.serde</groupId>
               <artifactId>micronaut-serde-processor</artifactId>
-              <version>${micronaut.version}</version>
+              <version>${micronaut.serialization.version}</version>
+              <exclusions>
+                <exclusion>
+                  <groupId>io.micronaut</groupId>
+                  <artifactId>micronaut-inject</artifactId>
+                </exclusion>
+              </exclusions>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
@@ -136,4 +113,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>
